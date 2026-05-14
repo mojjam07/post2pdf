@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { DocumentsPage } from './pages/DocumentsPage';
 import { DocumentDetailPage } from './pages/DocumentDetailPage';
 import { NewDocumentPage } from './pages/NewDocumentPage';
 import { SettingsPage } from './pages/SettingsPage';
@@ -42,7 +43,7 @@ export default function App() {
               path="/documents"
               element={
                 <PrivateRoute>
-                  <DashboardPage />
+                  <DocumentsPage />
                 </PrivateRoute>
               }
             />
