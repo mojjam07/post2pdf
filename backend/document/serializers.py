@@ -3,9 +3,22 @@ from .models import Document, Image
 
 
 class ImageSerializer(serializers.ModelSerializer):
+    # Always provide a URL that frontend can directly use in <img src="..." />
+    image_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Image
-        fields = ['id', 'image', 'order', 'brightness', 'contrast']
+        # Keep `image` for backward compatibility, but frontend should use `image_url`.
+        fields = ['id', 'image', 'image_url', 'order', 'brightness', 'contrast']
+
+    def get_image_url(self, obj: Image):
+        # Uses Django's MEDIA_URL mapping; request is available via serializer context.
+        request = self.context.get('request')
+        if not obj.image:
+            return None
+        url = obj.image.url
+        return request.build_absolute_uri(url) if request is not None else url
+
 
 
 class DocumentSerializer(serializers.ModelSerializer):

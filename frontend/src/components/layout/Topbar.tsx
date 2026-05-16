@@ -32,7 +32,7 @@ export function Topbar({ title, onMenuClick }: TopbarProps) {
             <input
               type="text"
               placeholder="Search..."
-              className="pl-10 pr-4 py-2 w-40 lg:w-64 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="pl-10 pr-4 py-2 w-40 lg:w-64 text-sm border text-gray-700 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
           </div>
 

@@ -74,6 +74,7 @@ return (
             value={formData.username}
             onChange={handleChange}
             placeholder="Choose a username"
+            className=' text-gray-500'
             required
           />
 
@@ -85,6 +86,7 @@ return (
             value={formData.email}
             onChange={handleChange}
             placeholder="Enter your email"
+            className=' text-gray-500'
             required
           />
 
@@ -97,6 +99,7 @@ return (
               value={formData.password}
               onChange={handleChange}
               placeholder="Create a password"
+              className=' text-gray-500'
               required
             />
             <button
@@ -116,6 +119,7 @@ return (
             value={formData.confirm_password}
             onChange={handleChange}
             placeholder="Confirm your password"
+            className=' text-gray-500'
             required
           />
 

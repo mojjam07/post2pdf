@@ -2,10 +2,12 @@
 export interface Image {
   id: number;
   image: string;
+  image_url?: string | null;
   order: number;
   brightness: number;
   contrast: number;
 }
+
 
 export interface Document {
   id: number;

@@ -32,7 +32,8 @@ class DocumentListView(generics.ListAPIView):
     """List documents with pagination, filtering, sorting, and search"""
     permission_classes = [IsAuthenticated]
     serializer_class = DocumentListSerializer
-    pagination_class = DocumentPagination
+    pagination_class = None
+
 
     def get_queryset(self):
         queryset = Document.objects.filter(user=self.request.user)
@@ -46,6 +47,11 @@ class DocumentListView(generics.ListAPIView):
         search = self.request.query_params.get('search')
         if search:
             queryset = queryset.filter(title__icontains=search)
+
+        # In case any other code/view adds filters incorrectly, ensure we always scope to the
+        # authenticated user.
+        queryset = queryset.filter(user=self.request.user)
+        
         
         # Sorting
         sort_by = self.request.query_params.get('sort_by', '-created_at')
@@ -128,11 +134,26 @@ class FetchDocumentFromUrlView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        source_url = request.data.get('source_url', '').strip()
+        # Frontend may send either `source_url` or `url`.
+        source_url = (
+            request.data.get('source_url')
+            or request.data.get('url')
+            or ''
+        ).strip()
         title = request.data.get('title', '').strip() or 'Untitled Document'
 
+
         if not source_url:
-            return Response({"error": "source_url is required"}, status=status.HTTP_400_BAD_REQUEST)
+            # Helps frontend developers quickly spot payload/field-name mismatches.
+            return Response(
+                {
+                    "error": "source_url is required",
+                    "received_keys": list(getattr(request, 'data', {}).keys()) if hasattr(request, 'data') else [],
+                    "received": request.data,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
 
         document = Document.objects.create(
             user=request.user,
@@ -240,29 +261,70 @@ class ReorderImagesView(APIView):
 
 
 class DownloadPDFView(APIView):
-    """Download PDF file"""
+    """Stream and delete a document after the download response finishes."""
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request, doc_id):
         document = get_object_or_404(Document, id=doc_id, user=request.user)
-        
+
         if not document.pdf_file:
             return Response(
                 {"error": "No PDF available for this document"},
-                status=status.HTTP_404_NOT_FOUND
+                status=status.HTTP_404_NOT_FOUND,
             )
-        
-        if not document.pdf_file.path or not os.path.exists(document.pdf_file.path):
+
+        pdf_path = document.pdf_file.path
+        if not pdf_path or not os.path.exists(pdf_path):
             return Response(
                 {"error": "PDF file not found"},
-                status=status.HTTP_404_NOT_FOUND
+                status=status.HTTP_404_NOT_FOUND,
             )
-        
-        # Return the file path/URL
-        return Response({
-            "pdf_url": document.pdf_file.url,
-            "filename": os.path.basename(document.pdf_file.name)
-        }, status=status.HTTP_200_OK)
+
+        filename = os.path.basename(document.pdf_file.name)
+
+        # Capture paths/files before deleting from DB.
+        # Note: Image files are deleted by Image.delete().
+        images_qs = list(document.images.all())
+
+        # Open the file for streaming.
+        pdf_handle = open(pdf_path, 'rb')
+
+        from django.http import FileResponse
+
+        response = FileResponse(pdf_handle, as_attachment=True, filename=filename)
+
+        def _cleanup():
+            try:
+                # Delete images (and their stored image files)
+                for img in images_qs:
+                    try:
+                        img.delete()
+                    except Exception:
+                        pass
+
+                # Delete PDF file from storage
+                try:
+                    if document.pdf_file:
+                        document.pdf_file.delete(save=False)
+                except Exception:
+                    pass
+
+                # Delete DB row
+                try:
+                    document.delete()
+                except Exception:
+                    pass
+            finally:
+                try:
+                    pdf_handle.close()
+                except Exception:
+                    pass
+
+        # Ensure cleanup only happens after streaming is done.
+        response.close = _cleanup
+        return response
+
 
 
 class AdjustImageView(APIView):

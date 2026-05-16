@@ -123,7 +123,7 @@ const statusColors = {
 {/* Image Gallery */}
         <Card>
           <CardHeader>
-            <h2 className="text-lg font-semibold">
+            <h2 className="text-lg font-semibold text-gray-500">
               Images ({document.images.length})
             </h2>
           </CardHeader>
@@ -140,11 +140,12 @@ const statusColors = {
                     className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer"
                     onClick={() => setSelectedImageId(image.id)}
                   >
-                    <img
-                      src={image.image}
+                      <img
+                      src={image.image_url || image.image}
                       alt={`Image ${image.order + 1}`}
                       className="w-full h-full object-cover"
                     />
+
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <Edit2 className="w-5 h-5 text-white" />
                     </div>

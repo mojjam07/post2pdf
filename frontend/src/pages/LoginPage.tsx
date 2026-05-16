@@ -54,6 +54,7 @@ return (
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Enter your username"
+            className=' text-gray-500'
             required
           />
 
@@ -65,6 +66,7 @@ return (
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
+              className=' text-gray-500'
               required
             />
             <button

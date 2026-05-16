@@ -52,7 +52,7 @@ return (
         <form onSubmit={handleSubmit}>
           <Card>
             <CardHeader>
-              <h2 className="text-lg font-semibold">Create New Document</h2>
+              <h2 className="text-lg text-gray-700 font-semibold">Create New Document</h2>
             </CardHeader>
             <CardContent className="space-y-4 md:space-y-6">
               {/* Upload Method Tabs - Responsive */}
@@ -84,6 +84,7 @@ return (
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Enter a title for your document"
+                className='text-gray-500'
               />
 
               {/* File Upload */}
@@ -134,6 +135,7 @@ return (
                   onChange={(e) => setSourceUrl(e.target.value)}
                   placeholder="https://example.com/document.pdf"
                   type="url"
+                  className=' text-gray-500'
                 />
               )}
 

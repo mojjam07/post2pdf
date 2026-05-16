@@ -72,7 +72,7 @@ export function DocumentsPage() {
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">Search</label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700" />
                   <Input
                     value={search}
                     onChange={(e) => {
@@ -80,7 +80,7 @@ export function DocumentsPage() {
                       setSearch(e.target.value);
                     }}
                     placeholder="Title..."
-                    className="pl-9"
+                    className="pl-9 text-gray-900"
                   />
                 </div>
               </div>
